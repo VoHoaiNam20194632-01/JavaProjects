@@ -1,0 +1,37 @@
+# Build
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Allure
+allure-results/
+allure-report/
+
+# Test output
+test-output/
+screenshots/
+cookies/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
