@@ -75,4 +75,20 @@ public abstract class BasePage {
         log.info("Navigating to: {}", url);
         getDriver().get(url);
     }
+
+    protected void switchToIFrame(By iframeLocator) {
+        log.info("Switching to iframe: {}", iframeLocator);
+        WebElement iframe = waitAndFind(iframeLocator, WaitStrategy.PRESENCE);
+        getDriver().switchTo().frame(iframe);
+    }
+
+    protected void switchToDefaultContent() {
+        log.info("Switching to default content");
+        getDriver().switchTo().defaultContent();
+    }
+
+    protected void uploadFile(By fileInput, String absolutePath) {
+        log.info("Uploading file: {}", absolutePath);
+        getDriver().findElement(fileInput).sendKeys(absolutePath);
+    }
 }

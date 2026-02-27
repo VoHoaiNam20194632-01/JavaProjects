@@ -69,4 +69,34 @@ public final class WaitUtils {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
         return wait.until(ExpectedConditions.titleContains(titlePart));
     }
+
+    public static void waitForSpinnerToDisappear() {
+        waitForSpinnerToDisappear(ConfigFactory.getWaitConfig().explicitWait());
+    }
+
+    public static void waitForSpinnerToDisappear(int timeoutSeconds) {
+        By spinner = By.cssSelector(".p-progress-spinner, .ngx-spinner-overlay");
+        waitForElementToDisappear(spinner, timeoutSeconds);
+    }
+
+    public static void waitForElementToDisappear(By locator, int timeoutSeconds) {
+        WebDriver driver = DriverManager.getDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (Exception ignored) {
+            // Element was already not present
+        }
+    }
+
+    public static boolean isElementDisplayed(By locator, int timeoutSeconds) {
+        WebDriver driver = DriverManager.getDriver();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

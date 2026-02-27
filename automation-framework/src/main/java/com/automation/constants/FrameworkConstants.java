@@ -22,6 +22,8 @@ public final class FrameworkConstants {
     public static final int IMPLICIT_WAIT = ConfigFactory.getWaitConfig().implicitWait();
     public static final int PAGE_LOAD_TIMEOUT = ConfigFactory.getWaitConfig().pageLoadTimeout();
 
+    public static final String IMAGES_PATH = RESOURCES_PATH + "/images";
+
     public static final String YES = "yes";
     public static final String NO = "no";
 }

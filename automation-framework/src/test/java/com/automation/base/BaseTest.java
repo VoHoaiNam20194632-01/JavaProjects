@@ -49,6 +49,7 @@ public abstract class BaseTest {
     protected HomePage loginWithSessionReuse() {
         LoginPage loginPage = new LoginPage();
         String baseUrl = getBaseUrl();
+        HomePage homePage;
 
         if (config.sessionReuse()) {
             log.info("Session reuse enabled, attempting to load session");
@@ -60,16 +61,22 @@ public abstract class BaseTest {
                     new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(5))
                             .until(ExpectedConditions.not(ExpectedConditions.urlContains("/login")));
                     log.info("Session restored successfully");
-                    return new HomePage();
-                } catch (Exception e) {
+                    homePage = new HomePage();
+                } catch (org.openqa.selenium.TimeoutException e) {
                     log.info("Session expired, performing fresh login");
+                    homePage = null;
+                }
+
+                if (homePage != null) {
+                    homePage.selectStore(getStoreName());
+                    return homePage;
                 }
             }
         }
 
         // Fresh login
         loginPage.open(baseUrl);
-        HomePage homePage = loginPage.loginAs(getAdminEmail(), getAdminPassword());
+        homePage = loginPage.loginAs(getAdminEmail(), getAdminPassword());
 
         if (config.sessionReuse()) {
             // Wait for login to fully complete before saving session
@@ -82,6 +89,11 @@ public abstract class BaseTest {
             CookieManager.saveSession();
         }
 
+        homePage.selectStore(getStoreName());
         return homePage;
+    }
+
+    protected String getStoreName() {
+        return config.storeName();
     }
 }

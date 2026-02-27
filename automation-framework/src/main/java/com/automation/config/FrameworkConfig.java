@@ -67,4 +67,7 @@ public interface FrameworkConfig extends Config {
     @DefaultValue("true")
     @Key("session.reuse")
     boolean sessionReuse();
+
+    @Key("store.name")
+    String storeName();
 }
