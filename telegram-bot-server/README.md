@@ -70,7 +70,7 @@ taskkill /PID <pid> /F
 ## Allure Report
 
 Sau mỗi test run, report tự động deploy lên GitHub Pages:
-- **URL**: https://vohoainam20194632.github.io/JavaProjects/
+- **URL**: https://vohoainam20194632-01.github.io/JavaProjects/
 
 Config trong `src/main/resources/application.yml`:
 ```yaml
