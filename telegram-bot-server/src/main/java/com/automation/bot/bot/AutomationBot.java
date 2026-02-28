@@ -15,6 +15,9 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Main Telegram bot class — nhận mọi Update từ Telegram qua Long Polling.
  *
@@ -81,5 +84,23 @@ public class AutomationBot implements SpringLongPollingBot, LongPollingSingleThr
     @AfterBotRegistration
     public void afterRegistration() {
         log.info("Telegram Bot '{}' registered and running!", botProperties.getUsername());
+        registerCommandMenu();
+    }
+
+    /**
+     * Đăng ký command menu với Telegram API (setMyCommands).
+     * Khi user gõ "/" trong chat → Telegram hiện danh sách commands gợi ý để chọn.
+     */
+    private void registerCommandMenu() {
+        List<org.telegram.telegrambots.meta.api.objects.commands.BotCommand> telegramCommands = new ArrayList<>();
+
+        for (BotCommand cmd : commandRegistry.getAllCommands().values()) {
+            telegramCommands.add(org.telegram.telegrambots.meta.api.objects.commands.BotCommand.builder()
+                    .command(cmd.name())
+                    .description(cmd.description())
+                    .build());
+        }
+
+        messageSender.setCommandMenu(telegramCommands);
     }
 }
