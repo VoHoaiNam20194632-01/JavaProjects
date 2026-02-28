@@ -47,6 +47,7 @@ public final class DriverFactory {
             ChromeOptions options = new ChromeOptions();
             if (headless) {
                 options.addArguments("--headless=new");
+                options.addArguments("--window-size=1920,1080");
             }
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
@@ -91,7 +92,11 @@ public final class DriverFactory {
         driver.manage().timeouts().pageLoadTimeout(
                 Duration.ofSeconds(ConfigFactory.getWaitConfig().pageLoadTimeout()));
 
-        if (config.maximize()) {
+        if (config.headless()) {
+            // Headless không có màn hình → maximize() không có tác dụng → phải set size cứng
+            driver.manage().window().setSize(
+                    new Dimension(config.browserWidth(), config.browserHeight()));
+        } else if (config.maximize()) {
             driver.manage().window().maximize();
         } else {
             driver.manage().window().setSize(
