@@ -48,6 +48,19 @@ public class CommandRegistry {
         return parser.parse(text);
     }
 
+    /**
+     * Đăng ký command sau khi bean đã tạo (dùng cho dynamic commands).
+     * Guard: không ghi đè command đã tồn tại (static commands ưu tiên).
+     */
+    public void registerCommand(BotCommand command) {
+        if (commands.containsKey(command.name())) {
+            log.debug("Command /{} already registered, skipping", command.name());
+            return;
+        }
+        commands.put(command.name(), command);
+        log.info("Registered dynamic command: /{} - {}", command.name(), command.description());
+    }
+
     public Map<String, BotCommand> getAllCommands() {
         return Collections.unmodifiableMap(commands);
     }

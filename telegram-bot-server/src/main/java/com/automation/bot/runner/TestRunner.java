@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,6 +46,9 @@ public class TestRunner {
         String runId = request.getRunId();
 
         try {
+            // Xóa allure-results cũ để report không trộn lẫn kết quả từ lần chạy trước
+            cleanAllureResults();
+
             List<String> command = buildCommand(request);
             log.info("[{}] Executing: {}", runId, String.join(" ", command));
 
@@ -98,6 +104,36 @@ public class TestRunner {
                     .duration(Duration.between(start, Instant.now()))
                     .errorMessage(e.getMessage())
                     .build();
+        }
+    }
+
+    /**
+     * Xóa thư mục allure-results trước mỗi lần chạy test.
+     * Tránh report bị trộn kết quả từ lần chạy trước (ví dụ: chạy LoginTest rồi CreateProductTest
+     * → report vẫn hiển thị LoginTest cũ vì allure-results chưa được dọn).
+     */
+    private void cleanAllureResults() {
+        Path allureResultsDir = Path.of(properties.getFrameworkPath(), "target", "allure-results");
+        if (!Files.exists(allureResultsDir)) {
+            return;
+        }
+        try {
+            Files.walkFileTree(allureResultsDir, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.deleteIfExists(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.deleteIfExists(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            log.info("Cleaned allure-results directory");
+        } catch (IOException e) {
+            log.warn("Failed to clean allure-results: {}", e.getMessage());
         }
     }
 
