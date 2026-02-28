@@ -158,9 +158,12 @@ public class TestRunner {
             command.add("-P" + request.getProfile());
         }
 
-        // Specific test class
+        // Specific test class — phải bỏ suiteXmlFile để Surefire chạy đúng class,
+        // không bị testng.xml override chạy cả suite (LoginTest, HomePageTest...)
         if (request.getTestClass() != null && !request.getTestClass().isEmpty()) {
             command.add("-Dtest=" + request.getTestClass());
+            command.add("-DfailIfNoTests=false");
+            command.add("-Dsurefire.suiteXmlFiles=");
         }
 
         // Environment, browser, headless
