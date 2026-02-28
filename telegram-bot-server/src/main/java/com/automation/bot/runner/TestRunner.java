@@ -46,8 +46,8 @@ public class TestRunner {
         String runId = request.getRunId();
 
         try {
-            // Xóa allure-results cũ để report không trộn lẫn kết quả từ lần chạy trước
-            cleanAllureResults();
+            // Xóa results cũ để report không trộn lẫn kết quả từ lần chạy trước
+            cleanPreviousResults();
 
             List<String> command = buildCommand(request);
             log.info("[{}] Executing: {}", runId, String.join(" ", command));
@@ -108,17 +108,22 @@ public class TestRunner {
     }
 
     /**
-     * Xóa thư mục allure-results trước mỗi lần chạy test.
+     * Xóa allure-results và surefire-reports trước mỗi lần chạy test.
      * Tránh report bị trộn kết quả từ lần chạy trước (ví dụ: chạy LoginTest rồi CreateProductTest
-     * → report vẫn hiển thị LoginTest cũ vì allure-results chưa được dọn).
+     * → cả Allure report lẫn Telegram notification vẫn hiển thị LoginTest cũ).
      */
-    private void cleanAllureResults() {
-        Path allureResultsDir = Path.of(properties.getFrameworkPath(), "target", "allure-results");
-        if (!Files.exists(allureResultsDir)) {
+    private void cleanPreviousResults() {
+        Path targetDir = Path.of(properties.getFrameworkPath(), "target");
+        deleteDirectory(targetDir.resolve("allure-results"));
+        deleteDirectory(targetDir.resolve("surefire-reports"));
+    }
+
+    private void deleteDirectory(Path dir) {
+        if (!Files.exists(dir)) {
             return;
         }
         try {
-            Files.walkFileTree(allureResultsDir, new SimpleFileVisitor<>() {
+            Files.walkFileTree(dir, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.deleteIfExists(file);
@@ -126,14 +131,14 @@ public class TestRunner {
                 }
 
                 @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.deleteIfExists(dir);
+                public FileVisitResult postVisitDirectory(Path d, IOException exc) throws IOException {
+                    Files.deleteIfExists(d);
                     return FileVisitResult.CONTINUE;
                 }
             });
-            log.info("Cleaned allure-results directory");
+            log.info("Cleaned directory: {}", dir.getFileName());
         } catch (IOException e) {
-            log.warn("Failed to clean allure-results: {}", e.getMessage());
+            log.warn("Failed to clean {}: {}", dir.getFileName(), e.getMessage());
         }
     }
 
