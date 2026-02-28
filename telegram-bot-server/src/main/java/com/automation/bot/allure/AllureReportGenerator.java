@@ -76,6 +76,9 @@ public class AllureReportGenerator {
                 reportUrl = allureProperties.getReportBaseUrl();
             }
 
+            // Thêm timestamp để bypass browser cache
+            reportUrl += "?t=" + System.currentTimeMillis();
+
             log.info("Allure report generated: {}", reportUrl);
             return reportUrl;
 
