@@ -25,6 +25,11 @@ public class ChatIdFilter {
     private final BotProperties botProperties;
 
     public boolean isAllowed(long chatId) {
+        // Nếu không cấu hình allowed-chat-ids (list rỗng) → cho phép tất cả
+        if (botProperties.getAllowedChatIds().isEmpty()) {
+            return true;
+        }
+
         boolean allowed = botProperties.getAllowedChatIds().contains(chatId);
         if (!allowed) {
             log.warn("Unauthorized access attempt from chatId={}", chatId);

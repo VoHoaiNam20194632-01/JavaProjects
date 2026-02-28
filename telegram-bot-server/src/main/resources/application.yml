@@ -2,8 +2,7 @@ bot:
   telegram:
     token: ${BOT_TOKEN:your-bot-token-here}
     username: ${BOT_USERNAME:nam_automation_bot}
-    allowed-chat-ids:
-      - 6169627315
+    allowed-chat-ids: []
 
   runner:
     framework-path: D:/JavaProjects/automation-framework
