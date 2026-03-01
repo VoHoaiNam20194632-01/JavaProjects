@@ -1,1 +1,1 @@
-[{"uid":"cb1d3903380abd66","name":"Create a POD product with random product base","time":{"start":1772336829915,"stop":1772336829916,"duration":1},"status":"skipped","severity":"critical"},{"uid":"f028dd10aa57e369","name":"loginAndNavigate","time":{"start":1772336829724,"stop":1772336829727,"duration":3},"status":"broken","severity":"normal"}]
+[{"uid":"75c341b3b37972b3","name":"Create a POD product with random product base","time":{"start":1772341898636,"stop":1772341968940,"duration":70304},"status":"passed","severity":"critical"}]
