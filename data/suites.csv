@@ -1,3 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","1688","Login page is displayed correctly","Surefire suite","Sun Mar 01 12:25:10 ICT 2026","passed","Sun Mar 01 12:25:12 ICT 2026","com.automation.ui.LoginTest","Surefire test","com.automation.ui.LoginTest","testLoginPageDisplayed"
-"","3898","Valid login with correct credentials","Surefire suite","Sun Mar 01 12:25:14 ICT 2026","passed","Sun Mar 01 12:25:18 ICT 2026","com.automation.ui.LoginTest","Surefire test","com.automation.ui.LoginTest","testValidLogin"
