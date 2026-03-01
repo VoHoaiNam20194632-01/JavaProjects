@@ -59,7 +59,7 @@ public abstract class BaseTest {
 
             if (loaded) {
                 try {
-                    WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(10));
+                    WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(30));
                     wait.until(ExpectedConditions.urlContains("/admin/home"));
                     wait.until(ExpectedConditions.visibilityOfElementLocated(WELCOME_HEADING));
                     log.info("Session restored successfully, URL: {}", DriverManager.getDriver().getCurrentUrl());
@@ -76,7 +76,15 @@ public abstract class BaseTest {
             }
         }
 
-        // Fresh login
+        // Fresh login - check if already on home page (session may have loaded late)
+        String currentUrl = DriverManager.getDriver().getCurrentUrl();
+        if (currentUrl != null && currentUrl.contains("/admin/home")) {
+            log.info("Already on home page (URL: {}), skipping login", currentUrl);
+            homePage = new HomePage();
+            homePage.selectStore(getStoreName());
+            return homePage;
+        }
+
         loginPage.open(baseUrl);
         homePage = loginPage.loginAs(getAdminEmail(), getAdminPassword());
 
