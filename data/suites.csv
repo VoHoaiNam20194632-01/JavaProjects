@@ -1,2 +1,2 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","70304","Create a POD product with random product base","Surefire suite","Sun Mar 01 12:11:38 ICT 2026","passed","Sun Mar 01 12:12:48 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","testCreatePODProduct"
+"","79040","Create a POD product with random product base","Surefire suite","Sun Mar 01 12:14:57 ICT 2026","passed","Sun Mar 01 12:16:16 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","testCreatePODProduct"
