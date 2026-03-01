@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -151,5 +153,80 @@ public class TestSuiteScanner {
             name = name.substring(0, name.length() - 4);
         }
         return name.toLowerCase();
+    }
+
+    /**
+     * Scan test classes và group theo package name.
+     * Ví dụ: com.automation.ui.LoginTest → group "ui", sub "login"
+     *         com.automation.product.CreateProductTest → group "product", sub "createproduct"
+     *
+     * @return Map: groupName → List<DiscoveredCommand> (mỗi command = 1 test class trong group)
+     */
+    public Map<String, List<DiscoveredCommand>> scanGrouped(String frameworkPath) {
+        Map<String, List<DiscoveredCommand>> groups = new HashMap<>();
+
+        Path root = Path.of(frameworkPath);
+        Path testDir = root.resolve("src/test/java");
+
+        if (!Files.isDirectory(testDir)) {
+            log.warn("Test directory not found: {}", testDir);
+            return groups;
+        }
+
+        try (Stream<Path> paths = Files.walk(testDir)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith("Test.java"))
+                    .forEach(p -> {
+                        String fileName = p.getFileName().toString();
+                        String className = fileName.replace(".java", "");
+
+                        if (EXCLUDED_CLASSES.contains(className)) {
+                            return;
+                        }
+
+                        String relativePath = testDir.relativize(p).toString().replace(File.separatorChar, '/');
+                        for (String excluded : EXCLUDED_PACKAGES) {
+                            if (relativePath.contains("/" + excluded + "/")) {
+                                return;
+                            }
+                        }
+
+                        // Extract group name: lấy package ngay trước test class
+                        // Ví dụ: "com/automation/tests/ui/LoginTest.java" → group = "ui"
+                        //         "com/automation/tests/product/CreateProductTest.java" → group = "product"
+                        String[] pathParts = relativePath.split("/");
+                        if (pathParts.length < 2) {
+                            // Test class ở root package → skip, không group được
+                            return;
+                        }
+
+                        // Group = thư mục cha gần nhất của test class
+                        String groupName = pathParts[pathParts.length - 2];
+
+                        // Skip nếu group trùng với excluded packages
+                        if (EXCLUDED_PACKAGES.contains(groupName)) {
+                            return;
+                        }
+
+                        String subCommandName = deriveCommandName(className);
+                        DiscoveredCommand cmd = new DiscoveredCommand(
+                                subCommandName,
+                                "Run " + className,
+                                null,
+                                className
+                        );
+
+                        groups.computeIfAbsent(groupName, k -> new ArrayList<>()).add(cmd);
+                        log.debug("Discovered grouped test: {} → group '{}', sub '{}'",
+                                className, groupName, subCommandName);
+                    });
+        } catch (IOException e) {
+            log.error("Failed to scan test classes for grouping: {}", e.getMessage(), e);
+        }
+
+        log.info("Discovered {} groups with {} total test classes",
+                groups.size(), groups.values().stream().mapToInt(List::size).sum());
+
+        return groups;
     }
 }

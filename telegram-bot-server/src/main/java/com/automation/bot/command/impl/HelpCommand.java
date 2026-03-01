@@ -49,7 +49,18 @@ public class HelpCommand implements BotCommand {
         joiner.add("*Available Commands:*\n");
 
         for (Map.Entry<String, BotCommand> entry : commands.entrySet()) {
-            joiner.add("/" + entry.getKey() + " — " + entry.getValue().description());
+            BotCommand cmd = entry.getValue();
+
+            if (cmd.isGroup()) {
+                // Grouped command → hiển thị dạng cây
+                joiner.add("\uD83D\uDCC2 /" + entry.getKey() + " \u2014 " + cmd.description());
+                Map<String, String> subs = cmd.getSubCommands();
+                for (Map.Entry<String, String> sub : subs.entrySet()) {
+                    joiner.add("   \u2514 /" + entry.getKey() + " " + sub.getKey() + " \u2014 " + sub.getValue());
+                }
+            } else {
+                joiner.add("/" + entry.getKey() + " \u2014 " + cmd.description());
+            }
         }
 
         messageSender.send(message.getChatId(), joiner.toString());

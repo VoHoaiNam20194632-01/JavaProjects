@@ -29,7 +29,9 @@ public class TelegramNotifier {
 
         // Header với status icon
         String icon = result.getStatus() == RunStatus.COMPLETED ? "\u2705" : "\u274c";
-        String label = request.getProfile() != null ? request.getProfile() : request.getTestClass();
+        String label = request.getProfile() != null ? request.getProfile()
+                : request.getTestClass() != null ? request.getTestClass()
+                : request.getTestClasses();
         sb.append(icon).append(" *").append(label.toUpperCase()).append(" TEST RESULT*\n\n");
 
         // Summary

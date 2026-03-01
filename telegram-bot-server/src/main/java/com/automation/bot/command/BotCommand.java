@@ -2,6 +2,9 @@ package com.automation.bot.command;
 
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * Interface cho mọi bot command.
  *
@@ -20,4 +23,10 @@ public interface BotCommand {
 
     /** Xử lý command. args là phần sau tên command, ví dụ: "/smoke dev" → args = "dev" */
     void execute(Message message, String args);
+
+    /** Có phải grouped command không (chứa sub-commands) */
+    default boolean isGroup() { return false; }
+
+    /** Danh sách sub-commands: key = sub name, value = description */
+    default Map<String, String> getSubCommands() { return Collections.emptyMap(); }
 }

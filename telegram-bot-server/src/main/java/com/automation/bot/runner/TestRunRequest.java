@@ -21,6 +21,7 @@ public class TestRunRequest {
     private final String env;
     private final String profile;       // Maven profile: smoke, regression, api
     private final String testClass;     // Specific test class: LoginTest, DashboardTest
+    private final String testClasses;   // Multiple test classes comma-separated: "LoginTest,DashboardTest"
     private final String browser;
     private final boolean headless;
 }

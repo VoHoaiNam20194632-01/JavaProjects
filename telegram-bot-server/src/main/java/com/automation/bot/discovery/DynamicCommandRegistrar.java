@@ -13,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +21,10 @@ import java.util.Map;
  * Đăng ký dynamic commands lúc startup.
  *
  * Flow:
- * 1. @PostConstruct → gọi TestSuiteScanner.scan()
- * 2. Lọc trùng tên với static commands đã đăng ký trong CommandRegistry
- * 3. Nếu trùng tên giữa profile và test class → profile thắng
- * 4. Đăng ký commands còn lại vào CommandRegistry
+ * 1. @PostConstruct → gọi TestSuiteScanner.scanGrouped()
+ * 2. Với mỗi group (package) → tạo GroupCommand chứa sub-commands
+ * 3. Đăng ký GroupCommand vào CommandRegistry
+ * 4. Static commands (SmokeCommand, RegressionCommand) vẫn ưu tiên nếu trùng tên
  */
 @Slf4j
 @Component
@@ -34,7 +34,7 @@ public class DynamicCommandRegistrar {
     private final CommandRegistry commandRegistry;
     private final TestRunnerProperties runnerProperties;
 
-    // Dependencies cần truyền cho DynamicTestCommand
+    // Dependencies cần truyền cho GroupCommand
     private final BotMessageSender messageSender;
     private final UserSessionManager sessionManager;
     private final TestRunner testRunner;
@@ -73,31 +73,27 @@ public class DynamicCommandRegistrar {
             return;
         }
 
-        List<DiscoveredCommand> discovered = scanner.scan(frameworkPath);
-
-        // Dedup: profile thắng test class nếu trùng commandName
-        Map<String, DiscoveredCommand> deduped = new HashMap<>();
-        for (DiscoveredCommand cmd : discovered) {
-            String name = cmd.getCommandName();
-            DiscoveredCommand existing = deduped.get(name);
-
-            if (existing == null) {
-                deduped.put(name, cmd);
-            } else if (cmd.getProfile() != null && existing.getProfile() == null) {
-                // Profile ưu tiên hơn test class
-                deduped.put(name, cmd);
-                log.debug("Profile '{}' overrides test class for command /{}", cmd.getProfile(), name);
-            }
-        }
+        // Scan grouped: package → list of test classes
+        Map<String, List<DiscoveredCommand>> groups = scanner.scanGrouped(frameworkPath);
 
         int registered = 0;
-        for (DiscoveredCommand cmd : deduped.values()) {
-            // CommandRegistry.registerCommand() sẽ skip nếu command đã tồn tại (static commands)
-            DynamicTestCommand dynamicCommand = new DynamicTestCommand(
-                    cmd.getCommandName(),
-                    cmd.getDescription(),
-                    cmd.getProfile(),
-                    cmd.getTestClass(),
+        for (Map.Entry<String, List<DiscoveredCommand>> entry : groups.entrySet()) {
+            String groupName = entry.getKey();
+            List<DiscoveredCommand> commands = entry.getValue();
+
+            // Build sub-command list
+            List<GroupCommand.SubCommandInfo> subCommands = new ArrayList<>();
+            for (DiscoveredCommand cmd : commands) {
+                subCommands.add(new GroupCommand.SubCommandInfo(
+                        cmd.getCommandName(),
+                        cmd.getTestClass(),
+                        cmd.getDescription()
+                ));
+            }
+
+            GroupCommand groupCommand = new GroupCommand(
+                    groupName,
+                    subCommands,
                     messageSender,
                     sessionManager,
                     runnerProperties,
@@ -108,10 +104,11 @@ public class DynamicCommandRegistrar {
                     allureGenerator
             );
 
-            commandRegistry.registerCommand(dynamicCommand);
+            // CommandRegistry.registerCommand() sẽ skip nếu command đã tồn tại (static commands)
+            commandRegistry.registerCommand(groupCommand);
             registered++;
         }
 
-        log.info("Dynamic command registration complete: {} commands processed", registered);
+        log.info("Dynamic command registration complete: {} group commands registered", registered);
     }
 }

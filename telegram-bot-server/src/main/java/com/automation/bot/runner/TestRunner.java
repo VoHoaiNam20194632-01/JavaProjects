@@ -164,6 +164,11 @@ public class TestRunner {
             command.add("-Dtest=" + request.getTestClass());
             command.add("-DfailIfNoTests=false");
             command.add("-Dsurefire.suiteXmlFiles=");
+        } else if (request.getTestClasses() != null && !request.getTestClasses().isEmpty()) {
+            // Multiple test classes (grouped command): "LoginTest,DashboardTest"
+            command.add("-Dtest=" + request.getTestClasses());
+            command.add("-DfailIfNoTests=false");
+            command.add("-Dsurefire.suiteXmlFiles=");
         }
 
         // Environment, browser, headless
