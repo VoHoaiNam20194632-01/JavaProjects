@@ -9,6 +9,7 @@ import com.automation.pages.LoginPage;
 import com.automation.utils.CookieManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
@@ -19,6 +20,7 @@ import java.time.Duration;
 public abstract class BaseTest {
 
     protected static final Logger log = LogManager.getLogger(BaseTest.class);
+    private static final By WELCOME_HEADING = By.xpath("//h5[normalize-space(text())='Welcome to BurgerShop']");
     protected FrameworkConfig config;
 
     @BeforeMethod(alwaysRun = true)
@@ -56,14 +58,14 @@ public abstract class BaseTest {
             boolean loaded = CookieManager.loadSession(baseUrl);
 
             if (loaded) {
-                // Wait for the server to validate session and redirect away from login
                 try {
-                    new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(5))
-                            .until(ExpectedConditions.not(ExpectedConditions.urlContains("/login")));
-                    log.info("Session restored successfully");
+                    WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(10));
+                    wait.until(ExpectedConditions.urlContains("/admin/home"));
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(WELCOME_HEADING));
+                    log.info("Session restored successfully, URL: {}", DriverManager.getDriver().getCurrentUrl());
                     homePage = new HomePage();
                 } catch (org.openqa.selenium.TimeoutException e) {
-                    log.info("Session expired, performing fresh login");
+                    log.info("Session invalid (did not reach home page), performing fresh login");
                     homePage = null;
                 }
 
@@ -79,12 +81,13 @@ public abstract class BaseTest {
         homePage = loginPage.loginAs(getAdminEmail(), getAdminPassword());
 
         if (config.sessionReuse()) {
-            // Wait for login to fully complete before saving session
+            // Wait for login to fully complete (home page loaded) before saving session
             try {
-                new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(10))
-                        .until(ExpectedConditions.not(ExpectedConditions.urlContains("/login")));
+                WebDriverWait wait = new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(15));
+                wait.until(ExpectedConditions.urlContains("/admin/home"));
+                wait.until(ExpectedConditions.visibilityOfElementLocated(WELCOME_HEADING));
             } catch (Exception e) {
-                log.warn("Login redirect did not complete within timeout");
+                log.warn("Home page did not fully load before saving session");
             }
             CookieManager.saveSession();
         }
