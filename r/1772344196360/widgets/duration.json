@@ -1,1 +1,0 @@
-[{"uid":"e24afb2522a076f6","name":"Login page is displayed correctly","time":{"start":1772344187694,"stop":1772344188334,"duration":640},"status":"passed","severity":"critical"},{"uid":"9e780ee70a005076","name":"Valid login with correct credentials","time":{"start":1772344190719,"stop":1772344193851,"duration":3132},"status":"passed","severity":"blocker"}]
