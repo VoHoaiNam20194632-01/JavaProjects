@@ -1,3 +1,3 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","1","loginAndNavigate","Surefire suite","Sun Mar 01 10:44:49 ICT 2026","broken","Sun Mar 01 10:44:49 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","loginAndNavigate"
-"","2","Create a POD product with random product base","Surefire suite","Sun Mar 01 10:44:50 ICT 2026","skipped","Sun Mar 01 10:44:50 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","testCreatePODProduct"
+"","3","loginAndNavigate","Surefire suite","Sun Mar 01 10:47:09 ICT 2026","broken","Sun Mar 01 10:47:09 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","loginAndNavigate"
+"","1","Create a POD product with random product base","Surefire suite","Sun Mar 01 10:47:09 ICT 2026","skipped","Sun Mar 01 10:47:09 ICT 2026","com.automation.ui.product.CreateProductTest","Surefire test","com.automation.ui.product.CreateProductTest","testCreatePODProduct"
